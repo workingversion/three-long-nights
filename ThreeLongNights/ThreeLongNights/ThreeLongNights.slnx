@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="ThreeLongNights.vcxproj" Id="43dfbecd-7c66-4068-a0b0-6be38df7651f" />
+</Solution>
