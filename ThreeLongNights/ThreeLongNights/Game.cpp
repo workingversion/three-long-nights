@@ -7,7 +7,7 @@ const int WIDTH{ 5 };
 const int HEIGHT{ 5 };
 
 // char input validation
-char getValidatedMovementOption(std::vector<char> chars)
+char getValidatedMovementOption(const std::vector<char>& chars)
 {
 	char input{};
 
@@ -21,6 +21,23 @@ char getValidatedMovementOption(std::vector<char> chars)
 			std::cin.clear();
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			std::cout << "Invalid input.\n";
+			continue;
+		}
+
+		bool found{ false };
+
+		for (char ch : chars)
+		{
+			if (input == ch)
+			{
+				found = true; 
+				break;
+			}	
+		}
+
+		if (!found)
+		{
+			std::cout << "Invalid character. Please choose from the ones selected.\n";
 			continue;
 		}
 
@@ -50,29 +67,28 @@ void printGrid(int tick, int playerX, int playerY)
 // main game loop
 int main()
 {
-	int playerY{ 2 };
-	int playerX{ 3 };
-	int newX{};
-	int newY{};
-	int tick = 1;
+	int playerX{ 2 };
+	int playerY{ 3 };
 
-	std::vector<char> movementOptions{ 'w', 'a', 's', 'd' };
+	int tick{ 1 };
+	std::vector<char> validMovementChars{ 'w', 'a', 's', 'd' };
 
 	while (true)
 	{
-		newX = playerX;
-		newY = playerY;
+		int newX{ playerX };
+		int newY{ playerY };
 		printGrid(tick, playerX, playerY);
-		char movementKey{ getValidatedMovementOption(movementOptions) };
 
-		if (movementKey == 'w')
-			newY = playerY - 1;
-		else if (movementKey == 'a')
-			newX = playerX - 1;
-		else if (movementKey == 's')
-			newY = playerY + 1;
-		else
-			newX = playerX + 1;
+		char playerInput{ getValidatedMovementOption(validMovementChars) };
+
+		if (playerInput == 'w')
+			newY -= 1;
+		else if (playerInput == 'a')
+			newX -= 1;
+		else if (playerInput == 's')
+			newY += 1;
+		else if (playerInput == 'd')
+			newX += 1;
 
 		if (newX >= 0 && newX < WIDTH && newY >= 0 && newY < HEIGHT)
 		{
@@ -84,6 +100,7 @@ int main()
 			std::cout << "You can't go that way.\n";
 		}
 
+		std::cout << '\n';
 		tick++;
 	}
 }
