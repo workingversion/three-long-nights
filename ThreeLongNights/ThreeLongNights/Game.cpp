@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 #include "Tile.h"
+#include "Player.h"
 
 
 // establish width and height of the grid
@@ -76,7 +77,7 @@ std::vector<Tile> createWorld()
 }
 
 // prints the grid as passed to it with divisions between layers and labels the tick
-void printWorld(const std::vector<Tile>& world, int tick, int playerX, int playerY)
+void printWorld(const std::vector<Tile>& world, int tick, Player& player)
 {
 	std::cout << "Tick " << tick << '\n';
 	// nested for loop to print rows (which come first, y) and columns (second, x)
@@ -84,8 +85,8 @@ void printWorld(const std::vector<Tile>& world, int tick, int playerX, int playe
 	{
 		for (int x{ 0 }; x < WIDTH; x++)
 		{
-			if (x == playerX && y == playerY)
-				std::cout << " @ ";
+			if (x == player.getX() && y == player.getY())
+				std::cout << ' ' << player.getSymbol() << ' ';
 			else
 				std::cout << ' ' << world[cellIndex(x, y)].getSymbol() << ' ';
 		}
@@ -98,8 +99,8 @@ void printWorld(const std::vector<Tile>& world, int tick, int playerX, int playe
 int main()
 {
 	srand(static_cast<unsigned>(time(nullptr)));
-	int playerX{ 2 };
-	int playerY{ 3 };
+	Player player{ 2, 3 };
+
 
 	int tick{ 1 };
 	std::vector<char> validMovementChars{ 'w', 'a', 's', 'd' };
@@ -107,9 +108,9 @@ int main()
 
 	while (true)
 	{
-		int newX{ playerX };
-		int newY{ playerY };
-		printWorld(world, tick, playerX, playerY);
+		int newX{ player.getX()};
+		int newY{ player.getY()};
+		printWorld(world, tick, player);
 
 		char playerInput{ getValidatedMovementOption(validMovementChars) };
 
@@ -124,8 +125,7 @@ int main()
 
 		if (newX >= 0 && newX < WIDTH && newY >= 0 && newY < HEIGHT)
 		{
-			playerX = newX;
-			playerY = newY;
+			player.setPos(newX, newY);
 			tick++;
 		}
 		else
