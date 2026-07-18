@@ -1,9 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <limits>
+#include <cstdlib>
+#include <ctime>
+#include "Tile.h"
+
 
 // establish width and height of the grid
-const int WIDTH{ 5 };
+const int WIDTH{ 10 };
 const int HEIGHT{ 5 };
 
 // char input validation
@@ -45,8 +49,34 @@ char getValidatedMovementOption(const std::vector<char>& chars)
 	}
 }
 
+// translation between x, y coords and grid index
+int cellIndex(int xCoord, int yCoord)
+{
+	return yCoord * WIDTH + xCoord;
+}
+
+// main world generation
+std::vector<Tile> createWorld()
+{
+	std::vector<Tile> world{};
+
+	for (int i{ 0 }; i < WIDTH * HEIGHT; i++)
+	{
+		int rng = rand() % 100 + 1;
+
+		if (rng <= 10)
+			world.push_back(Tile{ Tile::Water});
+		else if (rng <= 85)
+			world.push_back(Tile{ Tile::Grass});
+		else
+			world.push_back(Tile{ Tile::Bush});
+	}
+
+	return world;
+}
+
 // prints the grid as passed to it with divisions between layers and labels the tick
-void printGrid(int tick, int playerX, int playerY)
+void printWorld(const std::vector<Tile>& world, int tick, int playerX, int playerY)
 {
 	std::cout << "Tick " << tick << '\n';
 	// nested for loop to print rows (which come first, y) and columns (second, x)
@@ -57,7 +87,7 @@ void printGrid(int tick, int playerX, int playerY)
 			if (x == playerX && y == playerY)
 				std::cout << " @ ";
 			else
-				std::cout << " . ";
+				std::cout << ' ' << world[cellIndex(x, y)].getSymbol() << ' ';
 		}
 
 		std::cout << '\n';
@@ -67,17 +97,19 @@ void printGrid(int tick, int playerX, int playerY)
 // main game loop
 int main()
 {
+	srand(static_cast<unsigned>(time(nullptr)));
 	int playerX{ 2 };
 	int playerY{ 3 };
 
 	int tick{ 1 };
 	std::vector<char> validMovementChars{ 'w', 'a', 's', 'd' };
+	std::vector <Tile> world {createWorld()};
 
 	while (true)
 	{
 		int newX{ playerX };
 		int newY{ playerY };
-		printGrid(tick, playerX, playerY);
+		printWorld(world, tick, playerX, playerY);
 
 		char playerInput{ getValidatedMovementOption(validMovementChars) };
 
@@ -94,13 +126,11 @@ int main()
 		{
 			playerX = newX;
 			playerY = newY;
+			tick++;
 		}
 		else
 		{
 			std::cout << "You can't go that way.\n";
 		}
-
-		std::cout << '\n';
-		tick++;
 	}
 }
