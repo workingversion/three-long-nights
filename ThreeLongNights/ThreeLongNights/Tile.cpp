@@ -15,3 +15,8 @@ char Tile::getSymbol() const
 {
 	return symbol;
 }
+
+Tile::TileType Tile::getTileType() const
+{
+	return tileType;
+}

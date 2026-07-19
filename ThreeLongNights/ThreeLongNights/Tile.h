@@ -14,6 +14,7 @@ private:
 
 public:
 	char getSymbol() const;
+	TileType getTileType() const;
 	Tile(TileType type);
 };
 

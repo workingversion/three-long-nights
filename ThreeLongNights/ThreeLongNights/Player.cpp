@@ -24,3 +24,8 @@ void Player::setPos(int newX, int newY)
 	x = newX;
 	y = newY;
 }
+
+void Player::interactTile(Tile& tile)
+{
+	// TODO: add interaction
+}

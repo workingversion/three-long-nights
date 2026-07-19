@@ -7,18 +7,18 @@
 #include "Player.h"
 
 
-// establish width and height of the grid
+// establish width and height of grid
 const int WIDTH{ 10 };
 const int HEIGHT{ 5 };
 
 // char input validation
-char getValidatedMovementOption(const std::vector<char>& chars)
+char getValidatedPlayerAction(const std::vector<char>& actions)
 {
 	char input{};
 
 	while (true)
 	{
-		std::cout << "Type w/a/s/d to move up, left, down or right respectively: ";
+		std::cout << "Type w/a/s/d for movement, or x to interact with the tile you're standing on or nearby.";
 		std::cin >> input;
 
 		if (std::cin.fail())
@@ -31,9 +31,9 @@ char getValidatedMovementOption(const std::vector<char>& chars)
 
 		bool found{ false };
 
-		for (char ch : chars)
+		for (char action : actions)
 		{
-			if (input == ch)
+			if (input == action)
 			{
 				found = true; 
 				break;
@@ -77,7 +77,7 @@ std::vector<Tile> createWorld()
 }
 
 // prints the grid as passed to it with divisions between layers and labels the tick
-void printWorld(const std::vector<Tile>& world, int tick, Player& player)
+void printWorld(const std::vector<Tile>& world, int tick, const Player& player)
 {
 	std::cout << "Tick " << tick << '\n';
 	// nested for loop to print rows (which come first, y) and columns (second, x)
@@ -95,6 +95,11 @@ void printWorld(const std::vector<Tile>& world, int tick, Player& player)
 	}
 }
 
+bool isDay(int tick)
+{
+	return (tick % 100 < 50);
+}
+
 // main game loop
 int main()
 {
@@ -103,16 +108,17 @@ int main()
 
 
 	int tick{ 1 };
-	std::vector<char> validMovementChars{ 'w', 'a', 's', 'd' };
+	std::vector<char> validActionChars{ 'w', 'a', 's', 'd', 'x'};
 	std::vector <Tile> world {createWorld()};
 
-	while (true)
+	// game ends after 300 ticks (3 days)
+	while (tick <= 300)
 	{
 		int newX{ player.getX()};
 		int newY{ player.getY()};
 		printWorld(world, tick, player);
 
-		char playerInput{ getValidatedMovementOption(validMovementChars) };
+		char playerInput{ getValidatedPlayerAction(validActionChars) };
 
 		if (playerInput == 'w')
 			newY -= 1;
@@ -123,14 +129,18 @@ int main()
 		else if (playerInput == 'd')
 			newX += 1;
 
-		if (newX >= 0 && newX < WIDTH && newY >= 0 && newY < HEIGHT)
+		//TODO: add interact action in else if chain here
+
+		if (newX >= 0 && newX < WIDTH && newY >= 0 && newY < HEIGHT
+			&& world[cellIndex(newX, newY)].getTileType() != Tile::Water)
 		{
 			player.setPos(newX, newY);
-			tick++;
 		}
 		else
 		{
 			std::cout << "You can't go that way.\n";
 		}
+
+		tick++;
 	}
 }
