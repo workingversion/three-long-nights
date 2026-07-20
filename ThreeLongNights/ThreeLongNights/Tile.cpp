@@ -1,7 +1,7 @@
 #include "Tile.h"
 
 Tile::Tile(TileType type) :
-	tileType(type) 
+	tileType(type), hasResource(true), lastTickThatHadResource(0)
 { 
 	if (type == Tile::Water)
 		symbol = '~';
@@ -9,7 +9,7 @@ Tile::Tile(TileType type) :
 		symbol = 'x';
 	else
 		symbol = '.';
-};
+}
 
 char Tile::getSymbol() const
 {
@@ -19,4 +19,25 @@ char Tile::getSymbol() const
 Tile::TileType Tile::getTileType() const
 {
 	return tileType;
+}
+
+int Tile::getLastTickThatHadResource() const
+{
+	return lastTickThatHadResource;
+}
+
+bool Tile::getHasResource() const
+{
+	return hasResource;
+}
+
+void Tile::takeResource(int tick)
+{
+	hasResource = false;
+	lastTickThatHadResource = tick;
+}
+
+void Tile::respawnResource()
+{
+	hasResource = true;
 }

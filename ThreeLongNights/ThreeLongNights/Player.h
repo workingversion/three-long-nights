@@ -12,7 +12,7 @@ public:
 	int getY() const;
 	char getSymbol() const;
 	void setPos(int newX, int newY);
-	void interactTile(Tile& tile);
+	void interactTile(Tile& tile, int tick);
 	Player(int startingX, int startingY);
 };
 

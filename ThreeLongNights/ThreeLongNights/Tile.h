@@ -4,6 +4,8 @@
 class Tile
 {
 	char symbol;
+	bool hasResource;
+	int lastTickThatHadResource;
 public:
 	enum TileType
 	{
@@ -15,6 +17,10 @@ private:
 public:
 	char getSymbol() const;
 	TileType getTileType() const;
+	int getLastTickThatHadResource() const;
+	bool getHasResource() const;
+	void takeResource(int tick);
+	void respawnResource();
 	Tile(TileType type);
 };
 
