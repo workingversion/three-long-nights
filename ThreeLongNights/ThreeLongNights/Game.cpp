@@ -86,7 +86,7 @@ std::vector<Tile> createWorld()
 
 bool isDay(int tick)
 {
-	return (tick % 100 < 50);
+	return (( tick - 1) % 100 < 50);
 }
 
 // prints the grid as passed to it with divisions between layers and labels the tick
