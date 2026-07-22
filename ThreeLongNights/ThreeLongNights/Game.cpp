@@ -5,6 +5,7 @@
 #include <ctime>
 #include "Tile.h"
 #include "Player.h"
+#include "Animals.h"
 
 
 // establish width and height of grid
@@ -90,7 +91,7 @@ bool isDay(int tick)
 }
 
 // prints the grid as passed to it with divisions between layers and labels the tick
-void printWorld(const std::vector<Tile>& world, int tick, const Player& player)
+void printWorld(const std::vector<Tile>& world, int tick, const Player& player, std::vector<Animal*>&animals)
 {
 	std::string timeOfDay { isDay(tick) ? "Day" : "Night"};
 
@@ -100,9 +101,19 @@ void printWorld(const std::vector<Tile>& world, int tick, const Player& player)
 	{
 		for (int x{ 0 }; x < WIDTH; x++)
 		{
+			bool animalFound{ false };
+			for (Animal* animal : animals)
+			{
+				if (x == animal->getX() && y == animal->getY())
+				{
+					std::cout << ' ' << animal->getSymbol() << ' ';
+					animalFound = true;
+				}
+			}
+
 			if (x == player.getX() && y == player.getY())
 				std::cout << ' ' << player.getSymbol() << ' ';
-			else
+			else if (!animalFound)
 				std::cout << ' ' << world[cellIndex(x, y)].getSymbol() << ' ';
 		}
 
@@ -137,6 +148,22 @@ void applyOffsets(char input, int& x, int& y)
 		x += 1;
 }
 
+std::vector<int> getValidStartingCoordinates(const std::vector<Tile>& world, const Player& player)
+{
+	int randomX{ rand() % WIDTH };
+	int randomY{ rand() % HEIGHT };
+
+	int distance{ abs(randomX - player.getX()) + abs(randomY - player.getY()) };
+	while (!canEnter(randomX, randomY, world) || distance <= 3)
+	{
+		randomX = rand() % WIDTH;
+		randomY = rand() % HEIGHT;
+		distance = abs(randomX - player.getX()) + abs(randomY - player.getY());
+	}
+
+	return std::vector<int>{randomX, randomY};
+}
+
 // main game loop
 int main()
 {
@@ -148,12 +175,17 @@ int main()
 	std::vector<char> validActionChars{ 'w', 'a', 's', 'd', 'x'};
 	std::vector <Tile> world {createWorld()};
 
+	std::vector<int> bearStartingCoords{ getValidStartingCoordinates(world, player) };
+	Bear bear{ bearStartingCoords[0], bearStartingCoords[1]};
+
+	std::vector<Animal*> animals{&bear};
+
 	// game ends after 300 ticks (3 days)
 	while (tick <= 300)
 	{
 		int newX{ player.getX()};
 		int newY{ player.getY()};
-		printWorld(world, tick, player);
+		printWorld(world, tick, player, animals);
 
 		char playerInput{ getValidatedPlayerAction("Type w/a/s/d for movement, or x to open the interact options.", validActionChars)};
 		bool playerTriedToMove{ playerInput != 'x' && playerInput != 'X'};
@@ -185,6 +217,11 @@ int main()
 			{
 				std::cout << "There is no valid tile to interact with!\n";
 			}
+		}
+
+		for (Animal* animal : animals)
+		{
+			animal->takeTurn(world, player);
 		}
 
 		tick++;
