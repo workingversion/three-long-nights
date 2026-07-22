@@ -8,8 +8,8 @@
 
 
 // establish width and height of grid
-const int WIDTH{ 10 };
-const int HEIGHT{ 5 };
+const int WIDTH{ 20 };
+const int HEIGHT{ 20 };
 
 bool isActionValid(const std::vector<char>& actions, char input)
 {
@@ -72,9 +72,9 @@ std::vector<Tile> createWorld()
 	{
 		int rng = rand() % 100 + 1;
 
-		if (rng <= 10)
+		if (rng <= 5)
 			world.push_back(Tile{ Tile::Water});
-		else if (rng <= 85)
+		else if (rng <= 90)
 			world.push_back(Tile{ Tile::Grass});
 		else
 			world.push_back(Tile{ Tile::Bush});
@@ -110,6 +110,33 @@ void printWorld(const std::vector<Tile>& world, int tick, const Player& player)
 	}
 }
 
+// check if tile even exists
+bool isInBounds(int x, int y)
+{
+	return x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT;
+}
+
+// check if the grid tile it's trying to reach is accessible (not water)
+bool canEnter(int x, int y, const std::vector<Tile>& world)
+{
+	return isInBounds(x, y)
+		&& world[cellIndex(x, y)].getTileType() != Tile::Water;
+}
+
+// logic moved from main
+// takes input and applies properly
+void applyOffsets(char input, int& x, int& y)
+{
+	if (input == 'W' || input == 'w')
+		y -= 1;
+	else if (input == 'A' || input == 'a')
+		x -= 1;
+	else if (input == 'S' || input == 's')
+		y += 1;
+	else if (input == 'D' || input == 'd')
+		x += 1;
+}
+
 // main game loop
 int main()
 {
@@ -119,7 +146,6 @@ int main()
 
 	int tick{ 1 };
 	std::vector<char> validActionChars{ 'w', 'a', 's', 'd', 'x'};
-	std::vector<char> validInteractChars{ 'W', 'A', 'S', 'D', 'X'};
 	std::vector <Tile> world {createWorld()};
 
 	// game ends after 300 ticks (3 days)
@@ -130,53 +156,34 @@ int main()
 		printWorld(world, tick, player);
 
 		char playerInput{ getValidatedPlayerAction("Type w/a/s/d for movement, or x to open the interact options.", validActionChars)};
+		bool playerTriedToMove{ playerInput != 'x' && playerInput != 'X'};
 
-		if (playerInput == 'w')
-			newY -= 1;
-		else if (playerInput == 'a')
-			newX -= 1;
-		else if (playerInput == 's')
-			newY += 1;
-		else if (playerInput == 'd')
-			newX += 1;
-		else if (playerInput == 'x')
+		if (playerTriedToMove)
 		{
-			playerInput = getValidatedPlayerAction("Type W/A/S/D respectively to interact with the tile in that direction, or type 'X' to interact with the tile you're in.\nNote the capital letter.\n", validInteractChars);
+			applyOffsets(playerInput, newX, newY);
 
-			if (playerInput == 'W')
-				newY -= 1;
-			else if (playerInput == 'A')
-				newX -= 1;
-			else if (playerInput == 'S')
-				newY += 1;
-			else if (playerInput == 'D')
-				newX += 1;
-
-			if (newX >= 0 && newX < WIDTH && newY >= 0 && newY < HEIGHT)
-			{
-				player.interactTile(world[cellIndex(newX, newY)], tick);
-			}
-			else
-			{
-				std::cout << "There is no valid tile to interact with!\n";
-			}
-
-			// reset them so the next if statement doesn't check the interact tile, as it's meant to check the tile only attempting to be moved to
-			newX = player.getX();
-			newY = player.getY();
-		}
-
-		// avoids checking if the player interacted instead of moved
-		if (newX != player.getX() || newY != player.getY())
-		{
-			if (newX >= 0 && newX < WIDTH && newY >= 0 && newY < HEIGHT
-				&& world[cellIndex(newX, newY)].getTileType() != Tile::Water)
+			if (canEnter(newX, newY, world))
 			{
 				player.setPos(newX, newY);
 			}
 			else
 			{
 				std::cout << "You can't go that way.\n";
+			}
+		}
+		else
+		{
+			playerInput = getValidatedPlayerAction("Type w/a/s/d respectively to interact with the tile in that direction, or type 'x' to interact with the tile you're in.\n", validActionChars);
+
+			applyOffsets(playerInput, newX, newY);
+
+			if (isInBounds(newX, newY))
+			{
+				player.interactTile(world[cellIndex(newX, newY)], tick);
+			}
+			else
+			{
+				std::cout << "There is no valid tile to interact with!\n";
 			}
 		}
 
