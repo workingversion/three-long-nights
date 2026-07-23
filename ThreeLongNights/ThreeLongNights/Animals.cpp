@@ -2,8 +2,15 @@
 #include <iostream>
 #include "Animals.h"
 
-Animal::Animal(int startingX, int startingY) :
-	x(startingX), y(startingY) { }
+int stepToward(const int& from, const int& to)
+{
+	if (from > to) return -1;
+	else if (to < from) return 1;
+	else return 0;
+}
+
+Animal::Animal(int startingX, int startingY, char ascii) :
+	x(startingX), y(startingY), symbol(ascii) { }
 
 char Animal::getSymbol() const
 {
@@ -20,67 +27,54 @@ int Animal::getY() const
 	return y;
 }
 
-Bear::Bear(int startingX, int startingY) :
-	Animal(startingX, startingY) 
-{
-	symbol = 'B';
-};
-
-void Bear::takeTurn(const std::vector<Tile>& world, const Player& player)
-{
-	// if not at location, determine if x or y axis are aligned
-	// move one at random if both not aligned, move non-aligned one if one is aligned
-	if (player.getX() != x && player.getY() != y)
-	{
-		int moveXOrY{ rand() % 2 + 1 };
-
-		// x
-		if (moveXOrY == 1)
-		{
-			if (x > player.getX())
-				move(x - 1, y, world);
-			else
-				move(x + 1, y, world);
-
-		}
-		// y 
-		else if (moveXOrY == 2)
-		{
-			if (y > player.getY())
-				move(x, y - 1, world);
-			else
-				move(x, y + 1, world);
-		}
-	}
-	else if (player.getX() != x)
-	{
-		if (x > player.getX())
-			move(x - 1, y, world);
-		else
-			move(x + 1, y, world);
-	}
-	else if (player.getY() != y)
-	{
-		if (y > player.getY())
-			move(x, y - 1, world);
-		else
-			move(x, y + 1, world);
-	}
-
-	if (x == player.getX() && y == player.getY())
-	{
-		std::cout << "You get mauled by the bear!\n";
-	}
-}
-
-// so move() can use it
 bool canEnter(int x, int y, const std::vector<Tile>& world);
 
-void Bear::move(int newX, int newY, const std::vector<Tile>& world)
+bool Animal::move(int newX, int newY, const std::vector<Tile>& world)
 {
 	if (canEnter(newX, newY, world))
 	{
 		x = newX;
 		y = newY;
+		return true;
 	}
+
+	return false;
+}
+
+
+Bear::Bear(int startingX, int startingY) :
+	Animal(startingX, startingY, 'B')
+{ };
+
+void Bear::takeTurn(const std::vector<Tile>& world, const Player& player)
+{
+	int dx{ stepToward(x, player.getX()) };
+	int dy{ stepToward(y, player.getY()) };
+
+	if (dx && dy) // diagonal check
+	{
+		if (rand() % 2 == 0)
+		{
+			if (!move(x, y + dy, world)) // try vertical movement first
+				move(x + dx, y, world);
+		}
+		else
+		{
+			if (!move(x + dx, y, world)) // try horizontal movement first
+				move(x, y + dy, world);
+		}
+	}
+	else if (dx) // if horizontal difference only
+	{
+		if (!move(x + dx, y, world))
+			move(x, y + dy, world);
+	}
+	else if (dy) // if vertical difference only
+	{
+		if (!move(x, y + dy, world))
+			move(x + dx, y, world);
+	}
+
+	if (x == player.getX() && y == player.getY())
+		std::cout << "You get mauled by the bear!\n";
 }

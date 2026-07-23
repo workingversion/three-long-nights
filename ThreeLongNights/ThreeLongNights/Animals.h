@@ -16,8 +16,8 @@ public:
 	int getX() const;
 	int getY() const;
 	virtual void takeTurn(const std::vector<Tile>& world, const Player& player) = 0;
-	virtual void move(int x, int y, const std::vector<Tile>& world) = 0;
-	Animal(int startingX, int startingY);
+	bool move(int x, int y, const std::vector<Tile>& world);
+	Animal(int startingX, int startingY, char ascii);
 };
 
 
@@ -25,7 +25,6 @@ class Bear : public Animal
 {
 public:
 	void takeTurn(const std::vector<Tile>& world, const Player& player) override;
-	void move(int x, int y, const std::vector<Tile>& world) override;
 	Bear(int startingX, int startingY);
 };
 
