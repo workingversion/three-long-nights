@@ -9,8 +9,8 @@
 
 
 // establish width and height of grid
-const int WIDTH{ 20 };
-const int HEIGHT{ 20 };
+const int WIDTH{ 10 };
+const int HEIGHT{ 10 };
 
 bool isActionValid(const std::vector<char>& actions, char input)
 {
@@ -111,10 +111,13 @@ void printWorld(const std::vector<Tile>& world, int tick, const Player& player, 
 				}
 			}
 
-			if (x == player.getX() && y == player.getY())
-				std::cout << ' ' << player.getSymbol() << ' ';
-			else if (!animalFound)
-				std::cout << ' ' << world[cellIndex(x, y)].getSymbol() << ' ';
+			if (!animalFound)
+			{
+				if (x == player.getX() && y == player.getY())
+					std::cout << ' ' << player.getSymbol() << ' ';
+				else
+					std::cout << ' ' << world[cellIndex(x, y)].getSymbol() << ' ';
+			}
 		}
 
 		std::cout << '\n';
@@ -227,4 +230,7 @@ int main()
 		tick++;
 		std::cout << '\n';
 	}
+
+	// TODO: add game completion celebration
+	// maybe with stats? original tiles explored, berries picked, etc?
 }

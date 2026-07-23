@@ -66,8 +66,11 @@ void Bear::takeTurn(const std::vector<Tile>& world, const Player& player)
 		else
 			move(x, y + 1, world);
 	}
-	else
-		std::cout << "You get mauled by the bear\n";
+
+	if (x == player.getX() && y == player.getY())
+	{
+		std::cout << "You get mauled by the bear!\n";
+	}
 }
 
 // so move() can use it
