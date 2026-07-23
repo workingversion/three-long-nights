@@ -15,7 +15,7 @@ public:
 	char getSymbol() const;
 	int getX() const;
 	int getY() const;
-	virtual void takeTurn(const std::vector<Tile>& world, const Player& player) = 0;
+	virtual void takeTurn(const std::vector<Tile>& world, Player& player) = 0;
 	bool move(int x, int y, const std::vector<Tile>& world);
 	Animal(int startingX, int startingY, char ascii);
 };
@@ -24,7 +24,7 @@ public:
 class Bear : public Animal
 {
 public:
-	void takeTurn(const std::vector<Tile>& world, const Player& player) override;
+	void takeTurn(const std::vector<Tile>& world, Player& player) override;
 	Bear(int startingX, int startingY);
 };
 

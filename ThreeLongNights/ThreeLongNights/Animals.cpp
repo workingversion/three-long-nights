@@ -5,7 +5,7 @@
 int stepToward(const int& from, const int& to)
 {
 	if (from > to) return -1;
-	else if (to < from) return 1;
+	else if (to > from) return 1;
 	else return 0;
 }
 
@@ -46,7 +46,7 @@ Bear::Bear(int startingX, int startingY) :
 	Animal(startingX, startingY, 'B')
 { };
 
-void Bear::takeTurn(const std::vector<Tile>& world, const Player& player)
+void Bear::takeTurn(const std::vector<Tile>& world, Player& player)
 {
 	int dx{ stepToward(x, player.getX()) };
 	int dy{ stepToward(y, player.getY()) };
@@ -76,5 +76,9 @@ void Bear::takeTurn(const std::vector<Tile>& world, const Player& player)
 	}
 
 	if (x == player.getX() && y == player.getY())
-		std::cout << "You get mauled by the bear!\n";
+	{
+		int damageTaken{ rand() % 2 + 6 };
+		player.takeDamage(damageTaken);
+		std::cout << "The bear mauls you, dealing " << damageTaken << " damage!\n";
+	}
 }
